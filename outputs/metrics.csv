@@ -1,2 +1,2 @@
 subject_id,total_brain_volume_cm3,csf_volume_cm3,gm_volume_cm3,wm_volume_cm3,csf_voxels,gm_voxels,wm_voxels,total_brain_voxels,gm_wm_ratio,gm_csf_ratio,voxel_size_mm,image_shape
-sample_t1.nii,3147.206,965.221,1586.987,594.998,965221,1586987,594998,3147206,2.6672,1.6442,"[1.0, 1.0, 1.0]","[197, 233, 189]"
+sample_t1.nii,1651.889,150.449,926.689,574.751,150449,926689,574751,1651889,1.6123,6.1595,"[1.0, 1.0, 1.0]","[197, 233, 189]"

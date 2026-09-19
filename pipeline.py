@@ -106,7 +106,8 @@ class MRIPipeline:
         
         if method == "nilearn":
             # Use nilearn's brain mask computation
-            self.brain_mask = masking.compute_brain_mask(self.img, threshold=0.5)
+            mask_img = masking.compute_brain_mask(self.img, threshold=0.5)
+            self.brain_mask = mask_img.get_fdata().astype(np.float64)
         else:
             # Use morphological operations (pure Python)
             self.brain_mask = self._morphological_skull_strip()
@@ -124,6 +125,13 @@ class MRIPipeline:
         """
         Perform skull-stripping using intensity thresholding and morphological operations.
         
+        This method uses a multi-stage approach to eliminate extra-axial tissue (scalp, skull, neck):
+        1. Initial threshold to separate head from background
+        2. Aggressive erosion to remove skull/scalp layers
+        3. Largest connected component extraction to isolate brain
+        4. Conservative dilation to restore brain boundaries
+        5. Hole filling to ensure solid brain mask
+        
         Returns
         -------
         numpy.ndarray
@@ -134,29 +142,43 @@ class MRIPipeline:
         # Normalize intensity
         data_norm = (data - data.min()) / (data.max() - data.min())
         
-        # Initial threshold (Otsu)
-        threshold = filters.threshold_otsu(data_norm)
+        # Initial threshold using Otsu on non-zero voxels to separate head from background
+        non_zero_voxels = data_norm[data_norm > 0]
+        if len(non_zero_voxels) > 0:
+            threshold = filters.threshold_otsu(non_zero_voxels)
+        else:
+            threshold = filters.threshold_otsu(data_norm)
+        
         binary = data_norm > threshold
         
-        # 3D morphological operations
-        # Remove small objects
-        binary = morphology.remove_small_objects(binary, max_size=1000)
+        # Remove very small objects (noise)
+        binary = morphology.remove_small_objects(binary, max_size=100)
         
-        # Fill holes
+        # Fill holes in the initial mask
         binary = ndimage.binary_fill_holes(binary)
         
-        # Morphological closing to smooth
-        selem = morphology.ball(3)
-        binary = morphology.closing(binary, selem)
+        # Aggressive erosion to strip skull and scalp layers
+        # Use larger structuring element (radius 6) to remove exterior head layers
+        eroded = morphology.erosion(binary, morphology.ball(6))
         
-        binary = morphology.opening(binary, morphology.ball(2))
-        
-        # Find largest connected component (the brain)
-        labeled, num_features = ndimage.label(binary)
+        # Find largest connected component (the brain core)
+        labeled, num_features = ndimage.label(eroded)
         if num_features > 0:
-            sizes = ndimage.sum(binary, labeled, range(num_features + 1))
+            sizes = ndimage.sum(eroded, labeled, range(num_features + 1))
             max_label = sizes.argmax()
-            binary = labeled == max_label
+            brain_core = labeled == max_label
+        else:
+            brain_core = eroded
+        
+        # Conservative dilation to restore brain boundaries (smaller than erosion)
+        # This ensures we don't over-dilate back into skull/scalp
+        dilated = morphology.dilation(brain_core, morphology.ball(4))
+        
+        # Final hole filling to ensure solid brain mask
+        binary = ndimage.binary_fill_holes(dilated)
+        
+        # Light closing to smooth the mask
+        binary = morphology.closing(binary, morphology.ball(2))
         
         return binary.astype(np.float64)
     

@@ -184,8 +184,8 @@ CEREBRO MRI PIPELINE - Processing Start
 
 Performing skull-stripping using morphological method...
 Brain mask shape: (197, 233, 189)
-Brain voxels: 3147206
-Brain volume: 3147.21 cm³
+Brain voxels: 1651889
+Brain volume: 1651.89 cm³
 
 Performing tissue segmentation using gmm method...
 Segmentation complete. Shape: (197, 233, 189)
@@ -193,12 +193,12 @@ Segmentation complete. Shape: (197, 233, 189)
 Computing volumetric metrics...
 
 --- Volumetric Metrics ---
-Total Brain Volume: 3147.21 cm³
-CSF Volume: 965.22 cm³ (965221 voxels)
-Gray Matter Volume: 1586.99 cm³ (1586987 voxels)
-White Matter Volume: 595.00 cm³ (594998 voxels)
-GM/WM Ratio: 2.6672
-GM/CSF Ratio: 1.6442
+Total Brain Volume: 1651.89 cm³
+CSF Volume: 150.45 cm³ (150449 voxels)
+Gray Matter Volume: 926.69 cm³ (926689 voxels)
+White Matter Volume: 574.75 cm³ (574751 voxels)
+GM/WM Ratio: 1.6123
+GM/CSF Ratio: 6.1595
 
 Generating QC plots...
 QC plot saved to: outputs\sample_t1.nii_qc.png
