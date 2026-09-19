@@ -1,0 +1,23 @@
+{
+  "subject_id": "sample_t1.nii",
+  "total_brain_volume_cm3": 3147.206,
+  "csf_volume_cm3": 965.221,
+  "gm_volume_cm3": 1586.987,
+  "wm_volume_cm3": 594.998,
+  "csf_voxels": 965221,
+  "gm_voxels": 1586987,
+  "wm_voxels": 594998,
+  "total_brain_voxels": 3147206,
+  "gm_wm_ratio": 2.6672,
+  "gm_csf_ratio": 1.6442,
+  "voxel_size_mm": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "image_shape": [
+    197,
+    233,
+    189
+  ]
+}

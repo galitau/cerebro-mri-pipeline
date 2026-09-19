@@ -1,0 +1,16 @@
+# Python virtual environments & bytecode
+venv/
+__pycache__/
+*.pyc
+
+# Neuroimaging data & outputs (keep repo lightweight)
+data/*.nii
+data/*.nii.gz
+data/nilearn_data/
+outputs/*.nii
+outputs/*.nii.gz
+
+# Retain output visuals and metrics for portfolio showcase
+!outputs/metrics.csv
+!outputs/metrics.json
+!outputs/*_qc.png
