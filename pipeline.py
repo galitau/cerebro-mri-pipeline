@@ -170,9 +170,18 @@ class MRIPipeline:
         else:
             brain_core = eroded
         
-        # Conservative dilation to restore brain boundaries (smaller than erosion)
-        # This ensures we don't over-dilate back into skull/scalp
-        dilated = morphology.dilation(brain_core, morphology.ball(4))
+        # Conservative dilation to restore brain boundaries using anisotropic structuring element
+        # ball(8) in x-direction (sagittal) to recover dorsal cortex
+        # ball(4) in y/z directions (coronal/axial) to ensure better coverage
+        # Create anisotropic structuring element: radius 8 in x, radius 4 in y/z
+        selem_anisotropic = np.zeros((17, 9, 9), dtype=bool)
+        for x in range(17):
+            for y in range(9):
+                for z in range(9):
+                    # Check if within ellipsoid: (x-8)²/8² + (y-4)²/4² + (z-4)²/4² <= 1
+                    if ((x - 8)**2 / 64 + (y - 4)**2 / 16 + (z - 4)**2 / 16) <= 1:
+                        selem_anisotropic[x, y, z] = True
+        dilated = ndimage.binary_dilation(brain_core, structure=selem_anisotropic)
         
         # Final hole filling to ensure solid brain mask
         binary = ndimage.binary_fill_holes(dilated)
